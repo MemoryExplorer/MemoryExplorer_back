@@ -1,6 +1,7 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 import SttModule
+import FuzzyModule
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 @app.post("/uploadfile/")
 async def create_upload_file(file: UploadFile):
     contents = await file.read()
-    result= SttModule.upload_file_asr(contents)
+    result = SttModule.upload_file_asr(contents)
+    score = FuzzyModule.fuzzy_string(result, 9)
 
-    return {"result": result}
+    return {"result": result, "score": score}
