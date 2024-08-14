@@ -1,7 +1,6 @@
 from transformers import pipeline
 from io import BytesIO
 import soundfile as sf
-import librosa
 import torch
 
 # GPU 사용 여부 확인 및 설정
@@ -26,10 +25,7 @@ def upload_file_asr(contents):
         # 스테레오를 모노로 변환
         if len(audio_data.shape) > 1 and audio_data.shape[1] == 2:
             audio_data = audio_data.mean(axis=1)
-        
-        # 오디오 데이터를 목표 샘플링 레이트로 리샘플링
-        audio_data, sample_rate = resample_audio(audio_data, sample_rate, 16000)  # Whisper 모델이 16000Hz를 권장합니다.
-
+                
         # Whisper 모델에 입력할 포맷 확인
         audio_input = {"array": audio_data, "sampling_rate": sample_rate}
 
@@ -47,9 +43,3 @@ def upload_file_asr(contents):
         if audio_stream is not None:
             # BytesIO 객체 초기화(메모리 해제)
             audio_stream.close()
-
-def resample_audio(audio_data, orig_sr, target_sr=16000):
-    if orig_sr != target_sr:
-        # librosa.resample 호출 시 인자 이름을 사용
-        audio_data = librosa.resample(y=audio_data, orig_sr=orig_sr, target_sr=target_sr)
-    return audio_data, target_sr
