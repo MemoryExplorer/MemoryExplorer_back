@@ -26,3 +26,6 @@ async def create_upload_file(file: UploadFile):
 
     # 변환된 텍스트를 반환
     return {"text": result['text']}
+
+
+#test용 코드
