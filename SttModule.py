@@ -2,9 +2,13 @@ from transformers import pipeline
 from io import BytesIO
 import soundfile as sf
 import librosa
+import torch
+
+# GPU 사용 여부 확인 및 설정
+device = 0 if torch.cuda.is_available() else -1
 
 # Whisper 모델을 사용한 음성 인식 파이프라인 생성
-whisper_small = pipeline("automatic-speech-recognition", model="openai/whisper-small")
+whisper_small = pipeline("automatic-speech-recognition", model="openai/whisper-small", device=device)
 
 def upload_file_asr(contents):
     audio_stream = None
@@ -18,6 +22,10 @@ def upload_file_asr(contents):
         # 오디오 데이터 유효성 확인
         if audio_data.size == 0:
             raise ValueError("Empty audio data")
+        
+        # 스테레오를 모노로 변환
+        if len(audio_data.shape) > 1 and audio_data.shape[1] == 2:
+            audio_data = audio_data.mean(axis=1)
         
         # 오디오 데이터를 목표 샘플링 레이트로 리샘플링
         audio_data, sample_rate = resample_audio(audio_data, sample_rate, 16000)  # Whisper 모델이 16000Hz를 권장합니다.
