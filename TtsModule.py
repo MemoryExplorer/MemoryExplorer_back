@@ -47,6 +47,30 @@ sentences = [
     "티없이 맑은 하늘"
 ]
 
+# 이미지 파일이 저장된 디렉토리
+image_dir = 'C:/MemoryExplorer/MemoryExplorer_back/test_images'
+
+@app.get("/random-image")
+async def get_random_image():
+    try:
+        # 디렉토리에서 모든 파일 목록을 가져옵니다.
+        files = [f for f in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, f))]
+        
+        if not files:
+            raise HTTPException(status_code=404, detail="No images found")
+
+        # 파일 목록에서 랜덤으로 하나 선택
+        selected_file = random.choice(files)
+        file_path = os.path.join(image_dir, selected_file)
+
+        # 파일이 존재하는지 확인
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="File not found")
+        
+        return FileResponse(file_path, media_type='image/jpg')  # media_type을 이미지 형식에 맞게 설정
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # TTS 모듈 엔드포인트
 @app.post("/ttsmodule")
 async def tts_module(text: str = Form(...), filename: str = Form(...)):
@@ -108,7 +132,7 @@ async def get_questions():
         "Sunday": "일요일"
     }
     weekday_kr = weekdays_kr.get(weekday, "요일")
-
+    
     data = [
         # {"key": "Q1", "value": "지금 말하는 세가지 단어를 잘 기억해 주세요.", "audio_text": audio_text1},
         # {"key": "Q2", "value": "오늘은 몇 월, 무슨 요일 입니까?", "month": month, "weekday": weekday_kr},
