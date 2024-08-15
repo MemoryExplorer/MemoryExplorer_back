@@ -110,11 +110,12 @@ async def get_questions():
     weekday_kr = weekdays_kr.get(weekday, "요일")
 
     data = [
-        {"key": "Q1", "value": "지금 말하는 세가지 단어를 잘 기억해 주세요.", "audio_text1": audio_text1},
-        {"key": "Q2", "value": "오늘은 몇 월, 무슨 요일 입니까?", "month": month, "weekday": weekday_kr},
-        {"key": "Q4", "value": "지금 들리는 문장을 잘 듣고 그대로 따라해주세요.", "audio_text4": audio_text4},
-        {"key": "Q5", "value": "처음에 말했던 세가지 단어 중 한개만 말해주세요."},
-        {"key": "Q6", "value": "처음에 말했던 세가지 단어 중 또 다른 한개를 말해주세요."},
-        {"key": "Q7", "value": "처음에 말했던 세가지 단어 중 남은 한개를 말해주세요."}
+        # {"key": "Q1", "value": "지금 말하는 세가지 단어를 잘 기억해 주세요.", "audio_text": audio_text1},
+        # {"key": "Q2", "value": "오늘은 몇 월, 무슨 요일 입니까?", "month": month, "weekday": weekday_kr},
+        {"key": "Q3", "value": "사진 속 물체의 이름은 무엇인가요?"},
+        # {"key": "Q4", "value": "지금 들리는 문장을 잘 듣고 그대로 따라해주세요.", "audio_text": audio_text4},
+        # {"key": "Q5", "value": "처음에 말했던 세가지 단어 중 한개만 말해주세요."},
+        # {"key": "Q6", "value": "처음에 말했던 세가지 단어 중 또 다른 한개를 말해주세요."},
+        # {"key": "Q7", "value": "처음에 말했던 세가지 단어 중 남은 한개를 말해주세요."}
     ]
     return {"questions": data, "selected_words": selected_words, "selected_sentence": selected_sentence}
