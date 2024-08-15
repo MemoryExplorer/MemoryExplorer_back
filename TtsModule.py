@@ -47,6 +47,24 @@ sentences = [
     "티없이 맑은 하늘"
 ]
 
+# 영어 단어와 한국어 번역을 매칭하는 딕셔너리
+translations = {
+    "airplane": "비행기",
+    "apple": "사과",
+    "banana": "바나나",
+    "bicycle": "자전거",
+    "cat": "고양이",
+    "fan": "선풍기",
+    "glasses": "안경",
+    "hammer": "망치",
+    "rubber_gloves": "고무장갑",
+    "umbrella": "우산"
+}
+
+def get_translation(image_name):
+    # 딕셔너리에서 키가 존재하면 값을 반환
+    return translations.get(image_name, "번역이 없습니다")
+
 # 이미지 디렉토리 경로
 image_dir = 'C:/MemoryExplorer/MemoryExplorer_back/test_images'
 
@@ -123,6 +141,8 @@ async def get_questions():
     # 이미지 파일을 랜덤하게 선택
     image_files = [f for f in os.listdir(image_dir) if os.path.isfile(os.path.join(image_dir, f))]
     selected_image = random.choice(image_files) if image_files else None
+    image_name_en, _ = os.path.splitext(selected_image)
+    translation = get_translation(image_name_en)
 
     # 질문 데이터 구성
     data = [
@@ -138,5 +158,5 @@ async def get_questions():
         "questions": data,
         "selected_words": selected_words,
         "selected_sentence": selected_sentence,
-        "image_base_url": "http://localhost:8000/image/"  # 이미지 URL의 기본 경로
+        "image_name": translation
     }
