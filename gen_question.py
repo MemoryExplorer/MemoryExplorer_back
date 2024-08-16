@@ -35,7 +35,8 @@ translations = {
 
 # 이미지 디렉토리 경로
 # image_dir = 'C:/MemoryExplorer/MemoryExplorer_back/test_images'
-image_dir = 'C:/Users/user/MemoryExplorer/be/test_images'
+# image_dir = 'C:/Users/user/MemoryExplorer/be/test_images'
+image_dir = 'C:\\Users\\user\\memoryexplorer\\MemoryExplorer_back\\test_images'
 
 # 질문 데이터를 제공
 def get_translation(image_name):

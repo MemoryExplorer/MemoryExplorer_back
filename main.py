@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 # 무작위 질문 생성 엔드포인트
-@app.get("/api/questions")
+@app.get("/questions")
 async def get_questions():
 
     return gen_question.gen_question()
@@ -53,7 +53,8 @@ async def get_audio_file(filename: str):
 async def get_image_file(filename: str):
     # 이미지 디렉토리 경로
     # image_dir = 'C:/MemoryExplorer/MemoryExplorer_back/test_images'
-    image_dir = 'C:/Users/user/MemoryExplorer/be/test_images'
+    # image_dir = 'C:/Users/user/MemoryExplorer/be/test_images'
+    image_dir = 'C:\\Users\\user\\memoryexplorer\\MemoryExplorer_back\\test_images'
 
     file_path = os.path.join(image_dir, filename)
     if os.path.exists(file_path):
