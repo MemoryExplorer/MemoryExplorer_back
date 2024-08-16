@@ -60,11 +60,42 @@ async def get_image_file(filename: str):
         return FileResponse(file_path)
     raise HTTPException(status_code=404, detail="Image not found")
 
-# 녹음 된 오디오 파일 수신 및 처리 엔드포인트
-@app.post("/uploadfile/")
-async def create_upload_file(file: UploadFile):
+# 녹음 된 오디오 파일 수신 및 단어 인지력 처리 엔드포인트
+@app.post("/word/")
+async def time_recognition(file: UploadFile):
     contents = await file.read()
     result = SttModule.upload_file_asr(contents)
-    score = FuzzyModule.fuzzy_string(result, 9)
+    text_list = NerModule.ner_text(result) * 100
+    score_list = SllmModule.slm_text_list(text_list, 0)
+    score = 0
+    for i in range(len(score_list)):
+        score += score_list[i]
+
+    return {"result": result, "score": score}
+
+# 녹음 된 오디오 파일 수신 및 시간 인지력 처리 엔드포인트
+@app.post("/time/")
+async def time_recognition(file: UploadFile):
+    contents = await file.read()
+    result = SttModule.upload_file_asr(contents)
+    score = NerModule.ner_text(result) * 100
+
+    return {"result": result, "score": score}
+
+# 녹음 된 오디오 파일 수신 및 사물 인지력 처리 엔드포인트
+@app.post("/object/")
+async def object_recognition(file: UploadFile):
+    contents = await file.read()
+    result = SttModule.upload_file_asr(contents)
+    score = SllmModule.slm_text(result, 0)
+
+    return {"result": result, "score": score}
+
+# 녹음 된 오디오 파일 수신 및 따라하기 처리 엔드포인트
+@app.post("/repeat/")
+async def repeat_recognition(file: UploadFile):
+    contents = await file.read()
+    result = SttModule.upload_file_asr(contents)
+    score = FuzzyModule.fuzzy_string(result, 0)
 
     return {"result": result, "score": score}
