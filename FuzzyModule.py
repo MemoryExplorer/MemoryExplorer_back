@@ -16,12 +16,12 @@ sentence_list = [
     "티없이 맑은 하늘"
 ]
 
-def fuzzy_string(result, number):
+def fuzzy_string(result, answer):
 
     # 문자열 유사도 계산
-    similarity_score = fuzz.ratio(result, sentence_list[number])
+    similarity_score = fuzz.ratio(result, answer)
 
-    return similarity_score
+    return float(similarity_score) / 100
 
 # whisper_small = pipeline("automatic-speech-recognition", model="openai/whisper-small")
 # result = whisper_small("9.wav", generate_kwargs={"language": "korean"})

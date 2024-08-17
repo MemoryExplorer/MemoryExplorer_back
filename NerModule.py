@@ -48,8 +48,9 @@ def ner_text_list(text):
 
     return text_list
 
-whisper_small = pipeline("automatic-speech-recognition", model="openai/whisper-small")
-result_text = whisper_small("5.wav", generate_kwargs={"language": "korean"})
-print(result_text['text'])
+# whisper_small = pipeline("automatic-speech-recognition", model="openai/whisper-small")
+# result_text = whisper_small("1.wav", generate_kwargs={"language": "korean"})
+# print(result_text['text'])
 
-ner_text_list(result_text['text'])
+# print(ner_text_list(result_text['text']))
+# print(ner_text_list(result_text['text'])[1])
