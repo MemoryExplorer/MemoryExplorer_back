@@ -19,7 +19,7 @@ llm_model = AutoModelForCausalLM.from_pretrained(
     torch_dtype="auto",
     device_map="auto"
 )
-llm_tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-1.5B-Instruct")
+llm_tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
 
 def get_embedding(text):
     """입력된 텍스트의 BERT 임베딩을 반환합니다."""
