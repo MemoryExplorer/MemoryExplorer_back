@@ -1,4 +1,3 @@
-
 questions = [
     {"key": "Q1", "value": "지금 말하는\n세 가지 단어를\n잘 기억해 주세요."},
     {"key": "Q2", "value": "오늘은\n몇 월, 무슨 요일\n입니까?"},
@@ -42,7 +41,6 @@ imgs = {
     "rubber_gloves": "고무장갑",
     "umbrella": "우산"
 }
-
 
 # 이 정보를 이용하여 단어의 한글 번역을 반환
 def get_word_translation(word):
