@@ -12,6 +12,7 @@ import SttModule
 import FuzzyModule
 import NerModule
 import SllmModule
+import word_matching
 
 app = FastAPI()
 
@@ -178,7 +179,7 @@ async def object_recognition(file: UploadFile, answer: str = Form(...)):
     #result를 string type으로 변환
     result = next(iter(result))
     
-    score = SllmModule.slm_text(result, answer)
+    score = word_matching.slm_text(result, answer)
 
     return {
         "result": result, 
@@ -208,32 +209,32 @@ async def time_recognition(file: UploadFile, answer: str = Form(...)):
     contents = await file.read()
     result = SttModule.audio_to_text(contents)
     
-    #result를 string type으로 변환
+    # result를 string type으로 변환
     result = next(iter(result))
 
     text_list = NerModule.ner_text_list(result)
     answer_list = NerModule.ner_text_list(answer)
 
-    score_list = SllmModule.slm_text_list(text_list, answer_list)
-    score = 0
-    if not score_list:
-        print("score_list is empty or None. Defaulting score to 0.")
-    else:
-        for item in score_list:
-            try:
-                # 각 항목을 실수형으로 변환
-                score_value = float(item)
-            except (ValueError, TypeError):
-                # 변환할 수 없는 경우 0으로 처리
-                score_value = 0
+    score = word_matching.slm_text_list(text_list, answer_list)
+    # score = 0
+    # if not score_list:
+    #     print("score_list is empty or None. Defaulting score to 0.")
+    # else:
+    #     for item in score_list:
+    #         try:
+    #             # 각 항목을 실수형으로 변환
+    #             score_value = float(item)
+    #         except (ValueError, TypeError):
+    #             # 변환할 수 없는 경우 0으로 처리
+    #             score_value = 0
             
-        # 점수 누적
-        score += score_value
+    #     # 점수 누적
+    #     score += score_value
 
     return {
+            "answer": answer,
             "result": result, 
             "text_list": text_list,
             "answer_list": answer_list,
-            "score_list": score_list,
             "score": score,
             }

@@ -12,12 +12,12 @@ def ner_text(text):
 
     for i in range(len(result)):
         print(result[i])
-        if result[i]['entity'] == 'B-NOUN' or result[i]['entity'] == 'B-CONJ':
+        if result[i]['entity'] == 'B-NOUN' or result[i]['entity'] == 'B-CCONJ' or result[i]['entity'] == 'B-VERB':
             if result[i]['word'] == str(month):
                 score += 0.5
             else:
                 continue
-        elif result[i]['entity'] == 'NOUN':
+        elif result[i]['entity'] == 'NOUN' or result[i]['entity'] == 'B-VERB':
             if weekday == 0 and result[i]['word'] == "월요일":
                 score += 0.5
             elif weekday == 1 and result[i]['word'] == "화요일":
