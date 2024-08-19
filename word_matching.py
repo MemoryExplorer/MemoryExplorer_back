@@ -16,7 +16,8 @@ bert_model = BertModel.from_pretrained('kykim/bert-kor-base')
 
 llm_model = AutoModelForCausalLM.from_pretrained(
     "Qwen/Qwen2-0.5B-Instruct",
-    torch_dtype="auto",
+    # torch_dtype="auto",
+    torch_dtype=torch.float16,
     device_map="auto"
 )
 llm_tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
@@ -31,10 +32,10 @@ def get_embedding(text):
 
 # slm을 이용한 두 단어의 비교
 def llm_judge(text1, text2):
-    prompt = f"{text1}, {text2}:"
+    prompt = f"다음 두 단어를 비교하십시오: '{text1}'과 '{text2}'. 두 단어의 의미를 비교하여 '유사함' 또는 '유사하지 않음'으로 답변하십시오."
     messages = [
-        {"role": "system", "content": "당신은 주어진 두 단어의 의미를 비교하는 단어 분석가입니다."},
-        {"role": "system", "content": "결과는 반드시 '유사함' 또는'유사하지 않음'이어야 합니다."},
+        {"role": "system", "content": "당신은 주어진 두 단어의 의미를 비교하는 단어 분석가입니다. 결과를 '유사함' 또는 '유사하지 않음'으로 명확히 대답하십시오."},
+        # {"role": "system", "content": "결과는 반드시 '유사함' 또는'유사하지 않음'이어야 합니다."},
         {"role": "user", "content": prompt}
     ]
 
@@ -47,7 +48,11 @@ def llm_judge(text1, text2):
 
     generated_ids = llm_model.generate(
         model_inputs.input_ids,
-        max_new_tokens=520
+        max_new_tokens=100,
+        pad_token_id=llm_tokenizer.eos_token_id,  # Ensures proper padding
+        temperature=0.3,  # Adjust temperature to control randomness
+        top_p=0.5,  # Use nucleus sampling to improve result quality
+        top_k=10,
     )
 
     generated_ids = [
@@ -55,38 +60,47 @@ def llm_judge(text1, text2):
     ]
 
     response = llm_tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-    result = "그러나" in response or "유사함" not in response
+    result = "유사함" in response and "그러나" not in response
+    print(response)
     print(f"result: {result}")
 
     return result
 
+# llm_judge("냄비", "나무")
+
 def slm_text(text, answer):
+    text = str(text)
+    answer = str(answer)
     # 단순 단어(형태) 비교
     matcher_score = SequenceMatcher(None, text, answer).ratio()
     print(f"matcher_score: {matcher_score}")
 
+    #KoBert를 통한 두 단어의 유사도 점수 계산
+    """두 텍스트 간의 유사도 점수를 계산합니다."""
+    text1 = get_embedding(text)
+    text2 = get_embedding(answer)
+    # 코사인 유사도 계산
+    similarity = cosine_similarity([text1], [text2])[0][0]
+    print(f"similarity: {similarity}")
+
     if matcher_score == 1.0:
         return matcher_score
+    elif matcher_score > 0.2:
+        return (similarity + matcher_score) / 2
     else:
-        #KoBert를 통한 두 단어의 유사도 점수 계산
-        """두 텍스트 간의 유사도 점수를 계산합니다."""
-        text1 = get_embedding(text)
-        text2 = get_embedding(answer)
-        # 코사인 유사도 계산
-        similarity = cosine_similarity([text1], [text2])[0][0]
-        print(f"similarity: {similarity}")
-
         # slm을 통한 두 단어 비교
         result = llm_judge(text, answer)
 
         # slm이 두 단어가 유사하지 않다고 판단하면 형태와 KoBert 유사도 평균 사용
         # 두 단어가 유사하다고 평가하면 KoBert 유사도 사용
         if result:
-            score = (similarity + matcher_score) / 2
-        else:
             score = similarity
+        else:
+            score = (similarity + matcher_score) / 2
 
         return score
+    
+# print(slm_text("채소", "토마토"))
 
 def slm_text_list(text_list, answer_list):
     
@@ -99,6 +113,8 @@ def slm_text_list(text_list, answer_list):
         for i in range(n):
             for j in range(m):
                 matrix[i][j] = slm_text(text_list[i], answer_list[j])
+                if matrix[i][j] == 1:
+                    break
         
         best_score = -1
         best_permutation = None
@@ -111,10 +127,11 @@ def slm_text_list(text_list, answer_list):
                 best_permutation = perm
     else:   # n (text_list) > m (answer_list)
         matrix = np.zeros((m, n))
-        
         for i in range(m):
             for j in range(n):
                 matrix[i][j] = slm_text(answer_list[i], text_list[j])
+                if matrix[i][j] == 1:
+                    break
         
         best_score = -1
         best_permutation = None

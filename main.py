@@ -176,10 +176,13 @@ async def object_recognition(file: UploadFile, answer: str = Form(...)):
     contents = await file.read()
     result = SttModule.audio_to_text(contents)
 
-    #result를 string type으로 변환
+    # result를 string type으로 변환
     result = next(iter(result))
+
+    # result 앞 뒤에 있는 띄어쓰기 제거
+    trimmed_sentence = result.strip()
     
-    score = word_matching.slm_text(result, answer)
+    score = word_matching.slm_text(trimmed_sentence, answer)
 
     return {
         "result": result, 
@@ -213,7 +216,7 @@ async def time_recognition(file: UploadFile, answer: str = Form(...)):
     result = next(iter(result))
 
     text_list = NerModule.ner_text_list(result)
-    answer_list = NerModule.ner_text_list(answer)
+    answer_list = answer.split(", ")
 
     score = word_matching.slm_text_list(text_list, answer_list)
     # score = 0
